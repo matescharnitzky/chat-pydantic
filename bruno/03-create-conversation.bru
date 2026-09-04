@@ -1,0 +1,33 @@
+meta {
+  name: Create conversation
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/v1/conversations
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "title": "Bruno API test"
+  }
+}
+
+script:post-response {
+  bru.setVar("conversationId", res.getBody().id);
+}
+
+tests {
+  test("creates a conversation", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().id).to.be.a("string");
+    expect(res.getBody().title).to.equal("Bruno API test");
+  });
+}

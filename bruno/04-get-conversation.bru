@@ -1,0 +1,19 @@
+meta {
+  name: Get conversation
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/v1/conversations/{{conversationId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("reads the conversation created earlier in the collection", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().id).to.equal(bru.getVar("conversationId"));
+    expect(res.getBody().title).to.equal("Bruno API test");
+  });
+}

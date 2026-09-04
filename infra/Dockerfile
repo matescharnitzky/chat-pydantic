@@ -4,4 +4,6 @@ COPY infra/init.sh /usr/local/bin/init-infra
 COPY infra/init.sql /usr/local/share/init-infra.sql
 RUN chmod +x /usr/local/bin/init-infra
 
+USER postgres
+
 ENTRYPOINT ["init-infra"]

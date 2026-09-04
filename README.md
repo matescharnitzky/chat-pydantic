@@ -53,7 +53,7 @@ curl -X POST http://localhost:8000/v1/conversations/<conversation-id>/chat \
 Set `LOGFIRE_TOKEN` to export telemetry. Without a token, Logfire remains local and
 does not prevent startup.
 
-Stop the services without deleting PostgreSQL data:
+Stop the services and delete the local PostgreSQL data volume:
 
 ```bash
 make down

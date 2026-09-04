@@ -12,7 +12,7 @@ up:
 	docker compose up --build --wait
 
 down:
-	docker compose down
+	docker compose down -v
 
 test-api:
 	cd bruno && bru run --env local

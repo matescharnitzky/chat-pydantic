@@ -7,6 +7,7 @@ set -eu
 : "${CHAT_DB_NAME:?CHAT_DB_NAME is required}"
 : "${CHAT_DB_USER:?CHAT_DB_USER is required}"
 : "${CHAT_DB_PASSWORD:?CHAT_DB_PASSWORD is required}"
+: "${CHAT_DATABASE_URL:?CHAT_DATABASE_URL is required}"
 
 psql \
   --dbname postgres \
@@ -15,3 +16,7 @@ psql \
   --set chat_db_user="$CHAT_DB_USER" \
   --set chat_db_password="$CHAT_DB_PASSWORD" \
   --file /usr/local/share/init-infra.sql
+
+alembic \
+  -c services/chat-api/src/chat_api/infra/database/alembic.ini \
+  upgrade head

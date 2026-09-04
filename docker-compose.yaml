@@ -24,27 +24,10 @@ services:
       CHAT_DB_NAME: chat_db
       CHAT_DB_USER: chat_user
       CHAT_DB_PASSWORD: chat_password
+      CHAT_DATABASE_URL: ${CHAT_DATABASE_URL:-postgresql+asyncpg://chat_user:chat_password@postgres:5432/chat_db}
     depends_on:
       postgres:
         condition: service_healthy
-    restart: "no"
-
-  chat-migrate:
-    build:
-      context: .
-      dockerfile: services/chat-api/Dockerfile
-    environment:
-      CHAT_DATABASE_URL: ${CHAT_DATABASE_URL:-postgresql+asyncpg://chat_user:chat_password@postgres:5432/chat_db}
-      LOGFIRE_SEND_TO_LOGFIRE: "false"
-    command:
-      - alembic
-      - -c
-      - services/chat-api/src/chat_api/infra/database/alembic.ini
-      - upgrade
-      - head
-    depends_on:
-      init-infra:
-        condition: service_completed_successfully
     restart: "no"
 
   chat-api:
@@ -69,7 +52,7 @@ services:
       timeout: 3s
       retries: 20
     depends_on:
-      chat-migrate:
+      init-infra:
         condition: service_completed_successfully
 
 volumes:

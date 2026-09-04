@@ -10,9 +10,8 @@ AI agent, Harness input guardrail, and optional Logfire telemetry. The API start
 without external credentials; calling the chat endpoint requires `OPENAI_API_KEY`.
 
 Compose starts Stage 1 in dependency order: PostgreSQL, the one-shot `init-infra`
-job that idempotently creates the chat database and role, the one-shot
-`chat-migrate` job that applies service-owned Alembic migrations, and finally the
-chat API.
+job that idempotently creates the chat database and role and applies service-owned
+Alembic migrations, and finally the chat API.
 
 ## Local development
 

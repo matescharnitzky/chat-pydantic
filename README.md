@@ -15,11 +15,12 @@ Alembic migrations, and finally the chat API.
 
 ## Local development
 
-Requirements: Python 3.12, uv, Docker with Compose, and Bruno CLI for black-box API
-tests. On macOS, install the latter with `brew install bruno-cli`.
+Requirements: Python 3.12, uv, Docker with Compose, direnv, 1Password CLI, and
+Bruno CLI for black-box API tests. On macOS, install the latter three with
+`brew install direnv 1password-cli bruno-cli`.
 
 ```bash
-cp .env.example .env
+direnv allow
 make install
 make check
 make up
@@ -37,7 +38,8 @@ make test-api
 Pytest covers fast service and agent behavior; the Bruno collection verifies the
 live API and its PostgreSQL persistence through Docker Compose.
 
-To make a real model call, set `OPENAI_API_KEY` in `.env`, restart `chat-api`, then:
+To make a real model call, configure the ignored `.envrc` with the appropriate
+1Password secret references, run `direnv allow`, restart `chat-api`, then:
 
 ```bash
 curl -X POST http://localhost:8000/v1/conversations \
@@ -49,8 +51,8 @@ curl -X POST http://localhost:8000/v1/conversations/<conversation-id>/chat \
   -d '{"content":"Hello"}'
 ```
 
-Set `LOGFIRE_TOKEN` to export telemetry. Without a token, Logfire remains local and
-does not prevent startup.
+Configure `LOGFIRE_TOKEN` in `.envrc` to export telemetry. Without a token, Logfire
+remains local and does not prevent startup.
 
 Stop the services and delete the local PostgreSQL data volume:
 

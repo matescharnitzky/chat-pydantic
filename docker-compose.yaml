@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  init-infra:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      CHAT_DB_NAME: chat_db
+      CHAT_DB_USER: chat_user
+      CHAT_DB_PASSWORD: chat_password
+      CHAT_DATABASE_URL: ${CHAT_DATABASE_URL:-postgresql+asyncpg://chat_user:chat_password@postgres:5432/chat_db}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  chat-api:
+    build:
+      context: .
+      dockerfile: services/chat-api/Dockerfile
+    environment:
+      CHAT_DATABASE_URL: ${CHAT_DATABASE_URL:-postgresql+asyncpg://chat_user:chat_password@postgres:5432/chat_db}
+      CHAT_MODEL: ${CHAT_MODEL:-openai:gpt-5.2}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      LOGFIRE_SEND_TO_LOGFIRE: ${LOGFIRE_SEND_TO_LOGFIRE:-if-token-present}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    depends_on:
+      init-infra:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:
